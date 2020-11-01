@@ -1,4 +1,4 @@
-package opencv;
+package javafx.application;
 
 import org.opencv.core.Core;
 

@@ -1,4 +1,4 @@
-package opencv;
+package javafx.application;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,7 +22,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import utils.Utils;
+import opencv.FaceTrakingHelper;
+import opencv.utils.Utils;
 
 /**
  * The controller associated with the only view of our application. The
