@@ -44,10 +44,6 @@ public class FaceDetectionController {
 	@FXML
 	private ImageView originalFrame;
 	// checkboxes for enabling/disabling a classifier
-	@FXML
-	private CheckBox haarClassifier;
-	@FXML
-	private CheckBox lbpClassifier;
 
 	// a timer for acquiring the video stream
 	private ScheduledExecutorService timer;
@@ -67,11 +63,15 @@ public class FaceDetectionController {
 		this.capture = new VideoCapture();
 		this.faceCascade = new CascadeClassifier();
 		this.absoluteFaceSize = 0;
-
+		
 		// set a fixed width for the frame
 		originalFrame.setFitWidth(600);
 		// preserve image ratio
 		originalFrame.setPreserveRatio(true);
+		
+		this.checkboxSelection("resources/lbpcascades/lbpcascade_frontalface.xml");
+		// now the video capture can start
+		this.startCamera();
 	}
 
 	/**
@@ -81,8 +81,6 @@ public class FaceDetectionController {
 	protected void startCamera() {
 		if (!this.cameraActive) {
 			// disable setting checkboxes
-			this.haarClassifier.setDisable(true);
-			this.lbpClassifier.setDisable(true);
 
 			// start the video capture
 			this.capture.open(0);
@@ -92,17 +90,7 @@ public class FaceDetectionController {
 				this.cameraActive = true;
 
 				// grab a frame every 33 ms (30 frames/sec)
-				Runnable frameGrabber = new Runnable() {
-
-					@Override
-					public void run() {
-						// effectively grab and process a single frame
-						Mat frame = grabFrame();
-						// convert and show the frame
-						Image imageToShow = Utils.mat2Image(frame);
-						updateImageView(originalFrame, imageToShow);
-					}
-				};
+				Runnable frameGrabber = gretFrame();
 
 				this.timer = Executors.newSingleThreadScheduledExecutor();
 				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
@@ -119,12 +107,25 @@ public class FaceDetectionController {
 			// update again the button content
 			this.cameraButton.setText("Start Camera");
 			// enable classifiers checkboxes
-			this.haarClassifier.setDisable(false);
-			this.lbpClassifier.setDisable(false);
 
 			// stop the timer
 			this.stopAcquisition();
 		}
+	}
+
+	private Runnable gretFrame() {
+		Runnable frameGrabber = new Runnable() {
+
+			@Override
+			public void run() {
+				// effectively grab and process a single frame
+				Mat frame = grabFrame();
+				// convert and show the frame
+				Image imageToShow = Utils.mat2Image(frame);
+				updateImageView(originalFrame, imageToShow);
+			}
+		};
+		return frameGrabber;
 	}
 
 	/**
@@ -194,38 +195,12 @@ public class FaceDetectionController {
             //System.out.println(face.centre().toString());
 
             Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
-			Imgproc.rectangle(frame, face.centerOfFrame(), face.centerOfFrame(), new Scalar(100, 100, 100), 3);
-			Imgproc.rectangle(frame, face.pointDiff(new Point(100,100), face.centreDiff()), face.pointDiff(new Point(200,200),face.centreDiff()), new Scalar(100, 100, 100), 150);
+//			Imgproc.rectangle(frame, face.centerOfFrame(), face.centerOfFrame(), new Scalar(100, 100, 100), 3);
+//			Imgproc.rectangle(frame, face.pointDiff(new Point(100,100), face.centreDiff()), face.pointDiff(new Point(200,200),face.centreDiff()), new Scalar(100, 100, 100), 150);
 			 
 		}
 		
 
-	}
-
-	/**
-	 * The action triggered by selecting the Haar Classifier checkbox. It loads the
-	 * trained set to be used for frontal face detection.
-	 */
-	@FXML
-	protected void haarSelected(Event event) {
-		// check whether the lpb checkbox is selected and deselect it
-		if (this.lbpClassifier.isSelected())
-			this.lbpClassifier.setSelected(false);
-
-		this.checkboxSelection("resources/haarcascades/haarcascade_frontalface_alt.xml");
-	}
-
-	/**
-	 * The action triggered by selecting the LBP Classifier checkbox. It loads the
-	 * trained set to be used for frontal face detection.
-	 */
-	@FXML
-	protected void lbpSelected(Event event) {
-		// check whether the haar checkbox is selected and deselect it
-		if (this.haarClassifier.isSelected())
-			this.haarClassifier.setSelected(false);
-
-		this.checkboxSelection("resources/lbpcascades/lbpcascade_frontalface.xml");
 	}
 
 	/**
