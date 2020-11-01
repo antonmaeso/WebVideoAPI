@@ -9,7 +9,7 @@ function setConnected(connected) {
     else {
         $("#conversation").hide();
     }
-    $("#greetings").html("");
+    $("#headposition").html("");
 }
 
 function connect() {
@@ -18,8 +18,8 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/headposition', function (greeting) {
-            showGreeting(greeting.body);
+        stompClient.subscribe('/headposition', function (headposition) {
+            showHeadPosition(headposition.body);
         });
     });
 }
@@ -32,12 +32,8 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
-}
-
-function showGreeting(message) {
-    $("#greetings").append("<tr><td>" + message + "</td></tr>");
+function showHeadPosition(message) {
+    $("#headposition").append("<tr><td>" + message + "</td></tr>");
 }
 
 $(function () {
@@ -46,6 +42,5 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
 });
 
