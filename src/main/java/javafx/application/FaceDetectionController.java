@@ -22,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import opencv.CameraOperations;
 import opencv.FaceTrakingHelper;
 import opencv.utils.Utils;
 
@@ -79,41 +80,25 @@ public class FaceDetectionController {
 	 */
 	@FXML
 	protected void startCamera() {
-		if (!this.cameraActive) {
-			// disable setting checkboxes
-
-			// start the video capture
-			this.capture.open(0);
-
-			// is the video stream available?
-			if (this.capture.isOpened()) {
-				this.cameraActive = true;
-
+		this.cameraActive = new CameraOperations().startStopCamera(this.cameraActive, this.capture, this.timer);
+		if(this.cameraActive) {
+			this.cameraButton.setText("Start Camera");
+		} else {
+			this.cameraButton.setText("Stop Camera");
+		}	
+		
+		if (this.capture.isOpened()) {
 				// grab a frame every 33 ms (30 frames/sec)
-				Runnable frameGrabber = gretFrame();
-
+				Runnable frameGrabber = getFrame();
 				this.timer = Executors.newSingleThreadScheduledExecutor();
 				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
-
-				// update the button content
-				this.cameraButton.setText("Stop Camera");
 			} else {
 				// log the error
 				System.err.println("Failed to open the camera connection...");
 			}
-		} else {
-			// the camera is not active at this point
-			this.cameraActive = false;
-			// update again the button content
-			this.cameraButton.setText("Start Camera");
-			// enable classifiers checkboxes
-
-			// stop the timer
-			this.stopAcquisition();
-		}
 	}
 
-	private Runnable gretFrame() {
+	private Runnable getFrame() {
 		Runnable frameGrabber = new Runnable() {
 
 			@Override
