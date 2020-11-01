@@ -1,4 +1,4 @@
-package cv;
+package opencv;
 
 import org.opencv.core.Core;
 

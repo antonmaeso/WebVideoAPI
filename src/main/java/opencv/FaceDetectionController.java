@@ -1,4 +1,4 @@
-package cv;
+package opencv;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
