@@ -1,27 +1,23 @@
 
-package application;
+package webinterface.application.controllers;
 
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties.Template;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
 
 @Controller
-public class GreetingController {
+public class FacePostionController {
 	
 	@Autowired
 	SimpMessagingTemplate template;
 	public Random rnd = new Random();
 
-	@Scheduled(fixedDelay = 20000L)
+	@Scheduled(fixedDelay = 2000L)
 	public void greeting() throws Exception {
-		template.convertAndSend("/topic/greetings", rnd.nextInt());
+		template.convertAndSend("/headposition", rnd.nextInt());
 	}
 
 }
