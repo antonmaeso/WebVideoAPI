@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -22,6 +23,11 @@ public class ImageProcessing {
 	
 	private int absoluteFaceSize = 0;
 	private CascadeClassifier cascadeClassifier;
+	private Point faceCoordinates;
+	
+	public Point getFaceCoordinates() {
+		return faceCoordinates;
+	}
 	
 	public ImageProcessing(CascadeClassifier cascadeClassifier) {
 		this.cascadeClassifier = cascadeClassifier;
@@ -82,10 +88,10 @@ public class ImageProcessing {
 
 		Rect[] facesArray = faces.toArray();
 		
-		int distance = 10;
 		for (int i = 0; i < facesArray.length; i++) {
             FaceTrakingHelper face = new FaceTrakingHelper(facesArray[i], frame);
-            //System.out.println(face.centre().toString());
+            
+            this.faceCoordinates = face.centreFace();
 
             Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
 //			Imgproc.rectangle(frame, face.centerOfFrame(), face.centerOfFrame(), new Scalar(100, 100, 100), 3);
@@ -94,8 +100,5 @@ public class ImageProcessing {
 		}
 		
 	}
-
-	
-	
 
 }

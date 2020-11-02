@@ -19,7 +19,7 @@ public class CameraOperations {
 	}
 
 	
-	private void stopAcquisition(VideoCapture capture, ScheduledExecutorService timer) {
+	public void stopAcquisition(VideoCapture capture, ScheduledExecutorService timer) {
 		if (timer != null && !timer.isShutdown()) {
 			try {
 				timer.shutdown();
