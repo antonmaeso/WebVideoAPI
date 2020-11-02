@@ -29,17 +29,16 @@ public final class Utils
 	 *            the {@link Mat} representing the current frame
 	 * @return the {@link Image} to show
 	 */
-	public static Image mat2Image(Mat frame)
-	{
-		try
-		{
-			return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
-		}
-		catch (Exception e)
-		{
+	public static Image mat2Image(Mat frame) {
+		if (!frame.empty()) {
+		try {
+				return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
+			
+		} catch (Exception e) {
 			System.err.println("Cannot convert the Mat object: " + e);
-			return null;
 		}
+		}
+		return null;
 	}
 	
 	/**
@@ -73,14 +72,12 @@ public final class Utils
 		byte[] sourcePixels = new byte[width * height * channels];
 		original.get(0, 0, sourcePixels);
 		
-		if (original.channels() > 1)
-		{
+		if (original.channels() > 1) {
 			image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-		}
-		else
-		{
+		} else {
 			image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		}
+		
 		final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 		System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
 		

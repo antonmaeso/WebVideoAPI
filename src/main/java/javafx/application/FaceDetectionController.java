@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -16,10 +15,8 @@ import org.opencv.objdetect.Objdetect;
 import org.opencv.videoio.VideoCapture;
 
 
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import opencv.CameraOperations;
@@ -28,7 +25,6 @@ import opencv.utils.Utils;
 
 /**
  * The controller associated with the only view of our application. The
- * application logic is implemented here. It handles the button for
  * starting/stopping the camera, the acquired video stream, the relative
  * controls and the face detection/tracking.
  * 
@@ -64,12 +60,10 @@ public class FaceDetectionController {
 		this.capture = new VideoCapture();
 		this.faceCascade = new CascadeClassifier();
 		this.absoluteFaceSize = 0;
-		
 		// set a fixed width for the frame
 		originalFrame.setFitWidth(600);
 		// preserve image ratio
 		originalFrame.setPreserveRatio(true);
-		
 		this.checkboxSelection("resources/lbpcascades/lbpcascade_frontalface.xml");
 		// now the video capture can start
 		this.startCamera();
@@ -81,31 +75,29 @@ public class FaceDetectionController {
 	@FXML
 	protected void startCamera() {
 		this.cameraActive = new CameraOperations().startStopCamera(this.cameraActive, this.capture, this.timer);
-		if(this.cameraActive) {
+		if(!this.cameraActive) {
 			this.cameraButton.setText("Start Camera");
 		} else {
 			this.cameraButton.setText("Stop Camera");
 		}	
-		
 		if (this.capture.isOpened()) {
-				// grab a frame every 33 ms (30 frames/sec)
-				Runnable frameGrabber = getFrame();
-				this.timer = Executors.newSingleThreadScheduledExecutor();
-				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
-			} else {
-				// log the error
-				System.err.println("Failed to open the camera connection...");
-			}
+			processFrame(this.timer);
+		} else {
+			System.err.println("Failed to open the camera connection...");
+		}
 	}
 
-	private Runnable getFrame() {
-		Runnable frameGrabber = new Runnable() {
+	private void processFrame(ScheduledExecutorService timer) {
+		Runnable frameGrabber = getFrame(this.capture);
+		timer = Executors.newSingleThreadScheduledExecutor();
+		timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
+	}
 
+	private Runnable getFrame(VideoCapture capture) {
+		Runnable frameGrabber = new Runnable() {
 			@Override
 			public void run() {
-				// effectively grab and process a single frame
-				Mat frame = grabFrame();
-				// convert and show the frame
+				Mat frame = grabFrame(capture);
 				Image imageToShow = Utils.mat2Image(frame);
 				updateImageView(originalFrame, imageToShow);
 			}
@@ -118,27 +110,17 @@ public class FaceDetectionController {
 	 * 
 	 * @return the {@link Image} to show
 	 */
-	private Mat grabFrame() {
+	private Mat grabFrame(VideoCapture capture) {
 		Mat frame = new Mat();
 
-		// check if the capture is open
-		if (this.capture.isOpened()) {
-			try {
-				// read the current frame
-				this.capture.read(frame);
-
-				// if the frame is not empty, process it
-				if (!frame.empty()) {
-					// face detection
-					this.detectAndDisplay(frame);
-				}
-
-			} catch (Exception e) {
-				// log the (full) error
-				System.err.println("Exception during the image elaboration: " + e);
+		try {
+			capture.read(frame);
+			if (!frame.empty()) {
+				this.detectAndDisplay(frame);
 			}
+		} catch (Exception e) {
+			System.err.println("Exception during the image elaboration: " + e);
 		}
-
 		return frame;
 	}
 
@@ -150,29 +132,20 @@ public class FaceDetectionController {
 	private void detectAndDisplay(Mat frame) {
 		MatOfRect faces = new MatOfRect();
 		Mat grayFrame = new Mat();
-
-		// convert the frame in gray scale
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 		//System.out.println("height: "+ frame.height() + " width: " + frame.width());
-		// equalize the frame histogram to improve the result
 		Imgproc.equalizeHist(grayFrame, grayFrame);
-
-		// compute minimum face size (20% of the frame height, in our case)
 		if (this.absoluteFaceSize == 0) {
 			int height = grayFrame.rows();
 			if (Math.round(height * 0.2f) > 0) {
 				this.absoluteFaceSize = Math.round(height * 0.2f);
 			}
 		}
-		// find center point on the image
 		
-		// detect faces
 		this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
-				new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
+		new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 
-		// each rectangle in faces is a face: draw them!
 		Rect[] facesArray = faces.toArray();
-		
 		
 		int distance = 10;
 		for (int i = 0; i < facesArray.length; i++) {
