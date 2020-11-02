@@ -74,7 +74,6 @@ public class ImageProcessing {
 		MatOfRect faces = new MatOfRect();
 		Mat grayFrame = new Mat();
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
-		//System.out.println("height: "+ frame.height() + " width: " + frame.width());
 		Imgproc.equalizeHist(grayFrame, grayFrame);
 		if (this.absoluteFaceSize == 0) {
 			int height = grayFrame.rows();
@@ -89,11 +88,10 @@ public class ImageProcessing {
 		Rect[] facesArray = faces.toArray();
 		
 		for (int i = 0; i < facesArray.length; i++) {
-            FaceTrakingHelper face = new FaceTrakingHelper(facesArray[i], frame);
-            
-            this.faceCoordinates = face.centreFace();
+			FaceTrakingHelper face = new FaceTrakingHelper(facesArray[i], frame);
+			this.faceCoordinates = face.centreFace();
 
-            Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
+			Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
 //			Imgproc.rectangle(frame, face.centerOfFrame(), face.centerOfFrame(), new Scalar(100, 100, 100), 3);
 //			Imgproc.rectangle(frame, face.pointDiff(new Point(100,100), face.centreDiff()), face.pointDiff(new Point(200,200),face.centreDiff()), new Scalar(100, 100, 100), 150);
 			 
