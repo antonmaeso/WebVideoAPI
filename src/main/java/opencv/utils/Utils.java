@@ -31,12 +31,12 @@ public final class Utils
 	 */
 	public static Image mat2Image(Mat frame) {
 		if (!frame.empty()) {
-		try {
+			try {
 				return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
 			
-		} catch (Exception e) {
-			System.err.println("Cannot convert the Mat object: " + e);
-		}
+			} catch (Exception e) {
+				System.err.println("Cannot convert the Mat object: " + e);
+			}	
 		}
 		return null;
 	}
