@@ -89,13 +89,15 @@ public class ImageProcessing {
 		
 		for (int i = 0; i < facesArray.length; i++) {
 			FaceTrakingHelper face = new FaceTrakingHelper(facesArray[i], frame);
-			this.faceCoordinates = face.centreFace();
+			this.faceCoordinates = face.centreDiff();
 
-			Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
+//			Imgproc.rectangle(frame, face.centreFace(), face.centreFace(), new Scalar(0, 255, 0), 3);
 //			Imgproc.rectangle(frame, face.centerOfFrame(), face.centerOfFrame(), new Scalar(100, 100, 100), 3);
 //			Imgproc.rectangle(frame, face.pointDiff(new Point(100,100), face.centreDiff()), face.pointDiff(new Point(200,200),face.centreDiff()), new Scalar(100, 100, 100), 150);
 			 
 		}
+		
+		
 		
 	}
 

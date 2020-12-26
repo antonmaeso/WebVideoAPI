@@ -12,3 +12,23 @@ body {
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
+
+.dot {
+	position:absolute;
+	top:100px;
+	left:100px;
+	height: 25px;
+	width: 25px;
+	background-color: #bbb;
+	border-radius: 50%;
+	display: inline-block;
+
+}
+
+.relative{
+	  position: relative;
+  width: 400px;
+  height: 200px;
+  border: 3px solid #73AD21;
+	
+}

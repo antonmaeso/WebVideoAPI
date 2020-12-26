@@ -24,6 +24,8 @@ function connect() {
     });
 }
 
+
+
 function disconnect() {
     if (stompClient !== null) {
         stompClient.disconnect();
@@ -31,9 +33,30 @@ function disconnect() {
     setConnected(false);
     console.log("Disconnected");
 }
+var elem = null;
+var positionY= null;
+var positionX = null;
+function startCamera() {
+	elem = document.getElementById("animate");
+	positionY = elem.getBoundingClientRect().y;
+	positionX = elem.getBoundingClientRect().x;	
+	let d;
+    fetch("http://localhost:8080/startCamera").then(data=> d= data.json());
+console.log(d);
+    console.log("Camera started");
+}
 
-function showHeadPosition(message) {
-    $("#headposition").append("<tr><td>" + message + "</td></tr>");
+
+
+function showHeadPosition(message) {	    
+	var distanceFromCenter = JSON.parse(message);
+	var positionChangeRelativeY = positionY + (distanceFromCenter.y*0.1);
+	var positionChangeRelativeX = positionX + (distanceFromCenter.x*0.1);
+		
+	elem.style.top = positionChangeRelativeY + "px"; 
+	elem.style.left = positionChangeRelativeX + "px"; 
+	
+	$("#headposition").html("<tr><td>" + elem.style.top + "y--" + elem.style.left + "x" + "</td></tr>");
 }
 
 $(function () {
@@ -42,5 +65,7 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
+	$( "#startCamera" ).click(function() { startCamera(); });
 });
+
 
